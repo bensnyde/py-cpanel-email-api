@@ -9,675 +9,553 @@
 :Revision: $Revision: 0008 $
 :Description: Python library for interfacing Cpanel <http://www.cpanel.net> Email functions.
 """
+# coding: utf-8
 from httplib import HTTPSConnection
 from base64 import b64encode
 
 class Cpanel:
-        def __init__(self, url, username, password):
+        def __init__(self, url, username, password, scriptuser):
+            """Cpanel Email library public constructor.
+
+            :param url: Base URL to WHM server
+            :param username: API Username
+            :param password: API Password
+            :param scriptuser: WHM account to run scripts as
+            """
+                self.user = scriptuser
                 self.url = url
                 self.authHeader = {'Authorization':'Basic ' + b64encode(username+':'+password).decode('ascii')}
 
-        def cQuery(self, queryStr):
-                """Queries specified WHM server's JSON API with specified query string.
+        def cQuery(self, script, **kwargs):
+            """Queries specified WHM server's JSON API with specified query string.
 
-                :param queryStr: HTTP GET formatted query string
-                :returns: json formatted string
-                """
+            :param script: Cpanel script name
+            :param user: Cpanel username underwhich to call from
+            :param kwargs: Dictionary parameter pairs
+            :returns: json formatted string
+            """
+                # Build Query String
+                queryStr = '/json-api/cpanel?cpanel_jsonapi_user=%s&cpanel_jsonapi_module=Email&cpanel_jsonapi_func=%s&cpanel_xmlapi_version=2&' % (self.user, script)
+                for key,val in kwargs.iteritems():
+                        queryStr = queryStr + str(key) + '=' + str(val) + '&'
+
+                # Make JSON API call
                 conn = HTTPSConnection(self.url, 2087)
-                conn.request('GET', '/json-api/'+queryStr, headers=self.authHeader)
+                conn.request('GET', queryStr, headers=self.authHeader)
                 response = conn.getresponse()
                 data = response.read()
+
+                # Cleanup
                 conn.close()
                 return data
 
         # Account Functions
 
-        def createAccount(self, username, domain, *args):
-                """Creates a hosting account and sets up its associated domain information.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/CreateAccount
-                """
-                return self.cQuery('createacct?username='+username+'&domain='+domain)
-
-        def changeAccountPassword(self, username, password, update_db_password=True):
-                """Changes the password of a domain owner (cPanel) or reseller (WHM) account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ChangePassword
-                """
-                return self.cQuery('passwd?user='+username+'&pass='+password+'&db_pass_update='+update_db_password)
-
-        def limitAccountBandwidth(self, username, bwlimit):
-                """Modifies the bandwidth usage (transfer) limit for a specific account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/LimitBandwidth
-                """
-                return self.cQuery('limitbw?user='+username+'&bwlimit='+bwlimit)
-
-        def listAccounts(self, *args):
-                """Lists all accounts on the server, and also allows you to search for a specific account or set of accounts.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ListAccounts
-                """
-                return self.cQuery('lictaccts')
-
-        def modifyAccount(self, username, *args):
-                """Modifies settings for an account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ModifyAccount
-                """
-                return self.cQuery('modifyacct?user='+username)
-
-        def changeAccountDiskQuota(self, username, quota):
-                """Changes an account's disk space usage quota.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/EditQuota
-                """
-                return self.cQuery('editquota?user='+username+'&quota='+quota)
-
-        def getAccountSummary(self, username):
-                """Displays pertinent information about a specific account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ShowAccountInformation
-                """
-                return self.cQuery('accountsummary?user='+username)
-
-        def suspendAccount(self, username, reason=""):
-                """Allow you to prevent a cPanel user from accessing his or her account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SuspendAccount
-                """
-                return self.cQuery('suspendacct?user='+username+'&reason='+reason)
-
-        def listSuspendedAccounts(self):
-                """Generates a list of suspended accounts.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ListSuspended
-                """
-                return self.cQuery('listsuspended')
-
-        def terminateAccount(self, username, keep_dns=False):
-                """Permanently removes a cPanel account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/TerminateAccount
-                """
-                return self.cQuery('removeacct?user='+username+'&keepdns='+keep_dns)
-
-        def unsuspendAccount(self, username):
-                """Unsuspend a suspended account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/UnsuspendAcount
-                """
-                return self.cQuery('unsuspendacct?user='+username)
-
-        def changeAccountPackage(self, username, package):
-                """Changes the hosting package associated with a cPanel account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ChangePackage
-                """
-                return self.cQuery('changepackage?user='+username+'&pkg='+package)
-
-        def getDomainUserdata(self, domain):
-                """Obtains user data for a specific domain.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/DomainUserData
-                """
-                return self.cQuery('domainuserdata?domain='+domain)
-
-        def changeDomainIpAddress(self, domain, ip_address):
-                """Change the IP address of a website hosted on your server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetSiteIp
-                """
-                return self.cQuery('setsiteip?domain='+domain+'&ip='+ip_address)
-
-        def changeAccountIpAddress(self, username, ip_address):
-                """Change the IP address of a user account hosted on your server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetSiteIp
-                """
-                return self.cQuery('setsiteip?user='+username+'&ip='+ip_address)
-
-        def restoreAccountBackup(self, username, backup_type="daily", all_services=True, ip=True, mail=True, mysql=True, subs=True):
-                """Restore a user's account from a backup file.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreAccount
-                """
-                if(backup_type == "daily" || backup_type == "weekly" || backup_type == "monthly"):
-                        return self.cQuery('restoreaccount?api.version=1&user='+username+'&type='+backup_type+'&all='+all_services)
-
-        def setAccountDigestAuthentication(self, username, password, enable_digest=True):
-                """Enables or disables Digest Authentication for a user account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetDigestAuth
-                """
-                return self.cQuery('set_digest_auth?user='+username+'&password='+password+'&enabledigest='+enable_digest+'&api.version=1')
-
-        def getAccountDigestAuthentication(self, username):
-                """Checks whether a cPanel user has digest authentication enabled.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/HasDigestAuth
-                """
-                return self.cQuery('has_digest_auth?user='+username)
-
-        def getPrivileges(self):
-                """Generates a list of features you are allowed to use in WHM.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ViewPrivileges
-                """
-                return self.cQuery('myprivs')
-
-        def restoreAccountBackupQueued(self, username, restore_point, give_ip=False, mysql=True, subdomains=True, mail_config=True):
-                """Restore a user's account from a backup file.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueAdd
-                """
-                return self.cQuery('restore_queue_add_task?user='+username+'&restore_point='+restore_point
-                        +'&give_ip='+give_ip+'&mysql='+mysql+'&subdomains='+subdomains+'&mail_config='+mail_config)
-
-        def activateRestoreQueue(self):
-                """Activate the restore queue and start a process to restore all queued accounts.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueActivate
-                """
-                return self.cQuery('restore_queue_activate')
-
-        def getRestoreQueueState(self):
-                """See if the queue is actively in the restoration process for certain accounts.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueIsActive
-                """
-                return self.cQuery('restore_queue_is_active')
-
-        def getRestoreQueuePending(self):
-                """Lists all queued accounts to be restored.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueList
-                """
-                return self.cQuery('restore_queue_list_pending')
-
-        def getRestoreQueueActive(self):
-                """List all accounts currently in the restoration process.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueListActive
-                """
-                return self.cQuery('restore_queue_list_active')
-
-        def getRestoreQueueCompleted(self):
-                """Lists all completed restorations, successful restores, failed restores, and the restore log.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueListCompleted
-                """
-                return self.cQuery('restore_queue_list_completed')
-
-        def clearRestoreQueuePendingTask(self, username):
-                """Clears a single pending account from the Restoration Queue.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueClearPendingTask
-                """
-                return self.cQuery('restore_queue_clear_pending_task?user='+username)
-
-        def clearRestoreQueuePendingTasks(self):
-                """Clears all pending accounts from the restore queue.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueClearAllPendingTasks
-                """
-                return self.cQuery('restore_queue_clear_all_pending_tasks')
-
-        def clearRestoreQueueCompletedTask(self, username):
-                """Clears a single completed account from the Restoration Queue.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueClearCompletedTask
-                """
-                return self.cQuery('restore_queue_clear_completed_task?user='+username)
-
-        def clearRestoreQueueCompletedTasks(self):
-                """Clears all successfully completed accounts from the Restoration Queue.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueClearAllCompletedTasks
-                """
-                return self.cQuery('restore_queue_clear_all_completed_tasks')
-
-        def clearRestoreQueueFailedTasks(self):
-                """Clears all failed tasks from the Restoration Queue.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueClearAllFailedTasks
-                """
-                return self.cQuery('restore_queue_clear_all_failed_tasks')
-
-        def clearRestoreQueueAll(self):
-                """Clears all open, unresolved, or pending tasks from the Restoration Queue.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestoreQueueClearAllTasks
-                """
-                return self.cQuery('restore_queue_clear_all_tasks')
-
-
-        def getBackupConfig(self):
-                """Retreieves detailed data from your backup destination configuration file.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupConfigGet
-                """
-                return self.cQuery('backup_config_get')
-
-        def setBackupConfig(self, *args):
-                """Saves the data from the backup configuration page and put the data in /var/cpanel/bakcups/config.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupConfigSet
-                """
-                return self.cQuery('backup_config_set')
-
-        def setBackupConfigAllUsers(self, state=True):
-                """Choose which Backup Configuration to use, and enable or disable backups for all users.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupSkipUsersAll
-                """
-                return self.cQuery('backup_skip_users_all?state='+state)
-
-        def getBackupConfigAllUsers(self):
-                """Retrieves the value from the status log file in the backup_skip_users_all api call.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupSkipUsersAllStatus
-                """
-                return self.cQuery('backup_skip_users_all_status')
-
-        def getBackupListFiles(self):
-                """Lists all backup files available on the server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupSetList
-                """
-                return self.cQuery('backup_set_list')
-
-        def getBackupListDates(self):
-                """Retrieves a list of all dates with a backup file saved.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupDateList
-                """
-                return self.cQuery('backup_date_list')
-
-        def getBackupsByDate(self, date):
-                """Lists all users with a backup file saved on a specific date that you choose.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupUserList
-                """
-                return self.cQuery('backup_user_list?restore_point='+date)
-
-        def validateBackupDestination(self, destination_id, disable_on_fail=False):
-                """Run a validation routine on a specified backup destination.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupdDestinationValidatet
-                """
-                return self.cQuery('backup_destination_validate?id='+destination_id+'&disableonfail='+disable_on_fail)
-
-        def addBackupDestination(self, backup_type, *args):
-                """Create a backup destination and save it to a config file.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupDestinationAdd
-                """
-                if(backup_type == "FTP" || backup_type == "Local" || backup_type == "SFTP" || backup_type == "WebDav" || backup_type == "Custom"):
-                        return self.cQuery('backup_destination_add?type='+backup_type)
-
-        def setBackupDestination(self, destination_id, *args):
-                """Modifies the setup and data for a backup destination.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupDestinationSet
-                """
-                return self.cQuery('backup_destination_set?id='+destination_id)
-
-        def deleteBackupDestination(self, destination_id):
-                """Removes the backup destination config file.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupDestinationDelete
-                """
-                return self.cQuery('backup_destination_delete?id='+destination_id)
-
-        def getBackupDestinationDetails(self, destination_id):
-                """Retrieves detailed data for a specific backup destination from the backup destination config file.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupDestinationGet
-                """
-                return self.cQuery('backup_destination_get?id='+destination_id)
-
-        def listBackupDestionations(self):
-                """Lists all backup destinations, including their configuration information.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/BackupDestinationList
-                """
-                return self.cQuery('backup_destination_list')
-
-        # Package Functions
-
-        def addPackage(self, name, *args):
-                """Adds a new hosting package.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/AddPackage
-                """
-                return self.cQuery('addpkg?name='+name)
-
-        def deletePackage(self, name):
-                """Deletes a specific hosting package.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/DeletePackage
-                """
-                return self.cQuery('killpkg?pkg='+name)
-
-        def editPackage(self, name, *args):
-                """Edits all aspects of a specific hosting package.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/EditPackage
-                """
-                return self.cQuery('editpkg?name='+name)
-
-        def listPackages(self):
-                """Lists all hosting packages available for use by the WHM user who is currently logged in.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ListPackages
-                """
-                return self.cQuery('listpkgs')
-
-        def listFeatures(self):
-                """Retrieves a list of available features.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/XmlGetFeatureList
-                """
-                return self.cQuery('getfeaturelist')
-
-        # Service Functions
-
-        def restartService(self, service):
-                """Restarts a service (daemon) on the server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RestartService
-                """
-                return self.cQuery('restartservice?service='+service)
-
-        def getServiceStatus(self, service):
-                """Lists which services (daemons) are installed and enabled on, and monitored by, your server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ServiceStatus
-                """
-                return self.cQuery('servicestatus?service='+service)
-
-        def configureService(self, service, enabled=True, monitored=True):
-                """Enable or disable a service, and enable or disable monitoring of that service.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ConfigureService
-                """
-                return self.cQuery('configureservice?service='+service+'&enabled='+enabled+'&monitored='+monitored)
-
-        # SSL Functions
-
-        def getSSLDetails(self, domain):
-                """Displays the SSL certificate, private key, and CA bundle/intermediate certificate associated with a specified domain.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/FetchSSL
-                """
-                return self.cQuery('fetchsslinfo?domain='+domain)
-
-        def generateSSL(self, xemail, host, country, state, city, co, cod, email, password):
-                """Generates an SSL certificate.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/GenerateSSL
-                """
-                return self.cQuery('generatessl?xemail='+xemail+'&host='+host+'&country='+country+
-                        '&state='+state+'&city='+city+'&co='+co+'&cod='+cod+'&email='+email+'&pass='+password)
-
-        def installSSL(self, username, domain, cert, key, cab, ip):
-                """Installs an SSL certificate.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/InstallSSL
-                """
-                return self.cQuery('installssl?user='+username+'&domain='+domain+'&cert='+cert+'&key='+key+'&cab='+cab+'&ip='+ip)
-
-        def listSSL(self):
-                """Lists all domains on the server that have SSL certificates installed.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ListSSL
-                """
-                return self.cQuery('listcrts')
-
-        def setPrimaryDomain(self, servername, vtype="std"):
-                """Sets the primary domain on an IP address and port (ssl or std).
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetPrimaryDomain
-                """
-                return self.cQuery('set_primary_servername?api.version=1&servername='+servername+'&type='+vtype)
-
-        def checkSNI(self):
-                """See if the server supports SNI, which allows for multiple SSL certificates per IP address and port number.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/CheckSNISupport
-                """
-                return self.cQuery('is_sni_supported?api.version=1')
-
-
-        def installServiceSSL(self, service, crt, key, cabundle):
-                """Install a new certificate on ftp, exim, dovecot, courier, or cpanel.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/InstallServiceSslCertificate
-                """
-                return self.cQuery('install_service_ssl_certificate?service='+service+'&crt='+crt+'&key='+key+'&cabundle='+cabundle+'&api.version=1')
-
-        def regenerateServiceSSL(self, service):
-                """Regenerate a self-signed certificate and assign the certificate to ftp, exim, dovecot, courier, or cpanel.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ResetServiceSslCerificate
-                """
-                return self.cQuery('reset_service_ssl_certificate?api.version=1&service='+service)
-
-        def getServiceSSL(self):
-                """Retrieves a list of services and their corresponding certificates.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/FetchServiceCertificates
-                """
-                return self.cQuery('fetch_service_ssl_components')
-
-        # Reseller Functions
-
-        def demoteReseller(self, username):
-                """Removes reseller status from an account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RemoveResellerPrivileges
-                """
-                return self.cQuery('unsetupreseller?user='+username)
-
-        def promoteReseller(self, username, make_owner=False):
-                """Gives reseller status to an existing account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/AddResellerPrivileges
-                """
-                return self.cQuery('setupreseller?user='+username+'&makeowner='+make_owner)
-
-        def createResellerACL(self, acllist, *args):
-                """Creates a new reseller ACL list.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/CreateResellerACLList
-                """
-                return self.cQuery('saveacllist?acllist='+acllist)
-
-        def listResellerACL(self):
-                """Lists the saved reseller ACL lists on the server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ListCurrentResellerACLLists
-                """
-                return self.cQuery('listacls')
-
-        def listResellers(self):
-                """Lists the usernames of all resellers on the server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ListResellerAccounts
-                """
-                return self.cQuery('listresellers')
-
-        def getResellerDetails(self, reseller):
-                """Shows account statistics for a specific reseller's accounts.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ListResellersAccountsInformation
-                """
-                return self.cQuery('resellerstats?reseller='+reseller)
-
-        def getResellerIPs(self, username):
-                """Retrieves a list of IP Addresses that are available to a specified reseller.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/GetResellerips
-                """
-                return self.cQuery('getresellerips?user='+username)
-
-        def setResellerACL(self, reseller, *args):
-                """Specifies the ACL for a reseller, or modifies specific ACL items for a reseller.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetResellersACLList
-                """
-                return self.cQuery('setacls?reseller='+reseller)
-
-        def deleteReseller(self, reseller, terminate_reseller=True):
-                """Terminates a reseller's main account, as well as all accounts owned by the reseller.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/TerminateResellerandAccounts
-                """
-                verify = '%20all%20the%20accounts%20owned%20by%20the%20reseller%20'+reseller
-                return self.cQuery('terminatereseller?reseller='+reseller+'&terminatereseller='+terminate_reseller+'&verify='+verify)
-
-        def allocateResellerIP(self, username, *args):
-                """Add IP addresses to a reseller account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetResellerIps
-                """
-                return self.cQuery('setresellerips?user='+username)
-
-        def setResellerResourceLimits(self, username, *args):
-                """Specify the amount of bandwidth and disk space a reseller is able to use.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetResellerLimits
-                """
-                return self.cQuery('setresellerlimits?user='+username)
-
-        def setResellerPackage(self, username, *args):
-                """Control which packages resellers are able to use.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetResellerPkgLimit
-                """
-                return self.cQuery('setresellerpackagelimit?user='+username)
-
-        def setResellerMainIP(self, username, ip):
-                """Assigns a main, shared IP address to a reseller.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetResellerMainIp
-                """
-                return self.cQuery('setresellermainip?user='+username+'&ip='+ip)
-
-        def suspendReseller(self, username, reason=""):
-                """Suspend a reseller's account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SuspendReseller
-                """
-                return self.cQuery('suspendreseller?user='+username+'&reason='+reason)
-
-        def unsuspendReseller(self, username):
-                """Unsuspend a reseller's account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/UnsuspendReseller
-                """
-                return self.cQuery('unsuspendreseller?user='+username)
-
-        def setResellerNameservers(self, username, nameservers=""):
-                """Define a reseller's nameservers.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetResellerNameservers
-                """
-                return self.cQuery('setresellernameservers?user='+username+'&nameservers='+nameservers)
-
-        def listResellerAccounts(self, username):
-                """Lists the total number of accounts owned by a reseller.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/AcctCounts
-                """
-                return self.cQuery('acctcounts?user='+username)
-
-        # Server Functions
-
-        def getServerHostname(self):
-                """Lists the server's hostname.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/DisplayServerHostname
-                """
-                return self.cQuery('gethostname')
-
-        def getServerVersion(self):
-                """Displays the version of cPanel & WHM running on the server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/DisplaycPanelWHMVersion
-                """
-                return self.cQuery('version')
-
-        def getServerLoads(self):
-                """Displays your server's load average.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/LoadAvg
-                """
-                return self.cQuery('loadavg')
-
-        def getServerLoadsDetailed(self):
-                """Calculates and returns the system's load average.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/XmlSystemLoadAvg
-                """
-                return self.cQuery('systemloadavg?api.version=1')
-
-        def getServerLanguages(self):
-                """Retrieves a list of the languages available on your server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/GetLangList
-                """
-                return self.cQuery('getlanglist')
-
-        # Server Administration Functions
-
-        def rebootServer(self, force=False):
-                """Restart a server gracefully or forcefully.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/RebootServer
-                """
-                return self.cQuery('reboot?force='+force)
-
-        def addServerIP(self, ips, netmask):
-                """Add new IP address(es) to WebHost Manager.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/AddIPs
-                """
-                return self.cQuery('addips?api.version=1&ips='+ips+'&netmask='+netmask)
-
-        def deleteServerIP(self, ip, *args):
-                """Deletes an IP address from the server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/DeleteIPAddress
-                """
-                return self.cQuery('delip?ip='+ip)
-
-        def listServerIPs(self):
-                """Lists all IP addresses bound to network interfaces on the server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ListIPAddresses
-                """
-                return self.cQuery('listips')
-
-        def setServerHostname(self, hostname):
-                """Change the server's hostname.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetHostname
-                """
-                return self.cQuery('sethostname?hostname='+hostname)
-
-        def setServerResolvers(self, nameserver1, nameserver2="", nameserver3=""):
-                """Configures the nameservers that your server will use to resolve domain names.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetResolvers
-                """
-                return self.cQuery('setresolvers?nameserver1='+nameserver1+'&nameserver2='+nameserver2+'&nameserver3='+nameserver3)
-
-        def showBandwidthUsage(self, *args):
-                """Displays bandwidth information by account.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/ShowBw
-                """
-                return self.cQuery('showbw')
-
-        def setNvVar(self, nvkey, nvval):
-                """Create "non-volatile" variables and values, setting them to anything you wish.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/NvSet
-                """
-                return self.cQuery('nvset?key='+nvkey+'&value='+nvval)
-
-        def getNvVar(self, nvkey):
-                """View the value of a non-volatile variable.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/NvGet
-                """
-                return self.cQuery('nvget?key='+nvkey)
-
-        def setServerSupportTier(self, tier="stable"):
-                """Sets your server to the specified support tier.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetTier
-                """
-                return self.cQuery('getpkginfo?tier='+tier)
-
-        def getServerSupportTier(self):
-                """Lists all available support tiers of cPanel and WHM.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/GetAvailabletiers -
-                This function will retrieve a
-                """
-                return self.cQuery('get_available_tiers')
-
-        def generateAccessHash(self, *args):
-                """Retrieve an access hash for the root user.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/AccessHash
-                """
-                return self.cQuery('accesshash?api.version=1')
-
-        def getKeyDocuments(self, module, key, section=""):
-                """Retrieves documentation about a key referenced within a specified module.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/FetchDocKey
-                """
-                return self.cQuery('fetch_doc_key?module='+module+'&key='+key)
-
-        def validateEximConfigSpecified(self, cfg_text, section=""):
-                """Evaluates and validate Exim configuration file syntax.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/EximValidateSyntax
-                """
-                return self.cQuery('validate_exim_configuration_syntax?cfg_text='+cfg_text)
-
-        def validateEximConfig(self):
-                """Validates the system's current Exim configuration.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/EximValidateConfig
-                """
-                return self.cQuery('validate_current_installed_exim_config')
-
-        def checkRepairEximConfig(self):
-                """Checks and, if it encounters any errors, attempt to repair your Exim configuration.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/EximConfigurationCheck
-                """
-                return self.cQuery('exim_configuration_check')
-
-        def removeInProgressEximEdit(self):
-                """Removes dry run files after a failed Exim update attempt.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/EximRemoveDryRunConfig
-                """
-                return self.cQuery('remove_in_progress_exim_config_edit')
-
-        def getTweakSettingsValue(self, key, module="Main"):
-                """Retrieve the value of an option available on the WHM Tweak Settings screen.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/GetTweakSetting
-                """
-                return self.cQuery('get_tweaksetting?api.version=1&key='+key+'&module='+module)
-
-        def setTweakSettingsValue(self, key, val, module="Main"):
-                """Change the value of an option available on the WHM Tweak Settings screen.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetTweakSetting
-                """
-                return self.cQuery('set_tweaksetting?api.version=1&key='+key+'&value='+val+'&module='+module)
-
-        def getDeliveryRecords(self, *args):
-                """Retrieves email delivery records.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/EmailTrackSearch -
-                """
-                return self.cQuery('emailtrack_search?api.version=1')
-
-        def setServerUpdateFrequency(self, updates="manual"):
-                """Sets the frequency that updates will run on the server.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/SetCpanelupdates
-                """
-                return self.cQuery('set_cpanel_updates?updates='+updates)
-
-        def getAppConfigApps(self):
-                """Lists applications that are registered with AppConfig.
-                http://docs.cpanel.net/twiki/bin/view/SoftwareDevelopmentKit/GetAppconfigapplicationlist
-                """
-                return self.cQuery('get_appconfig_application_list')
+        def addpop(self, domain, email, password, quota):
+                """Adds a new email account.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::addpop=
+
+                :param domain: The domain for the new email account
+                :param email: The username for the new email account
+                :param password: The password for the new email account
+                :param quota: A positive integer that defines the disk quota for the email account (0 is unlimited)
+                :returns: json formatted string
+                """
+                data = {
+                        'domain': domain,
+                        'email': email,
+                        'password': password,
+                        'quota': quota
+                }
+                return self.cQuery('addpop', **data)
+
+        def delpop(self, domain, email):
+                """Deletes an email account.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::delpop=
+
+                :param domain: The domain for the email account you wish to remove
+                :param email: The username for the email address you wish to remove
+                :returns: json formatted string
+                """
+                data = {
+                        'domain': domain,
+                        'email': email
+                }
+                return self.cQuery('delpop', **data)
+
+        def editquota(self, domain, email, quota):
+                """Modifies an email account's quota.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::editquota=
+
+                :param domain: The domain for the email account you wish to modify
+                :param email: The username for the email address you wish to modify
+                :param quota: A positive integer that indicates the desired disk quota value in megabytes (0 is unlimited)
+                :returns: json formatted string
+                """
+                data = {
+                        'domain': domain,
+                        'email': email,
+                        'quota': quota
+                }
+                return self.cQuery('editquota', **data)
+
+        def passwdpop(self, domain, email, password):
+                """Changes an email account's password.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::passwdpop=
+
+                :param domain: The domain for the email address for which you wish to change the password
+                :param email: The username for the email address for which you wish to change the password
+                :param password: The desired password for the account
+                :returns: json formatted string
+                """
+                data = {
+                        'domain': domain,
+                        'email': email,
+                        'password': password,
+                }
+                return self.cQuery('passwdpop', **data)
+
+        def clearpopcache(self, username):
+                """Rebuilds an email address's cache file.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::clearpopcache=
+
+                :param username: The username for the email account for which you wish to rebuild the cache file
+                :returns: json formatted string
+                """
+                data = {'username': username}
+                return self.cQuery('clearpopcache', **data)
+
+        def listpops(self, regex=None):
+                """Retrieves a list of email accounts associated with your cPanel account.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listpops=
+
+                :param regex: The regular expression by which you wish to filter the results
+                :returns: json formatted string
+                """
+                data = {}
+                if regex:
+                        data['regex'] = regex
+                return self.cQuery('listpops', **data)
+
+        def listpopssingles(self, regex=None):
+                """Retrieves a list of email accounts and logins associated with your cPanel account.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listpopssingles=
+
+                :param regex: The regular expression by which you wish to filter the results
+                :returns: json formatted string
+                """
+                if regex:
+                        data = {'regex': regex}
+                return self.cQuery('listpopssingles', **data)
+
+
+        def listpopswithdisk(self, domain=None, nearquotaonly=False, no_validate=False, regex=None):
+                """Lists email accounts, including disk usage, that correspond to a particular domain.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listpopswithdisk=
+
+                :param domain: The domain for which you wish to view email accounts
+                :param nearquotaonly: If you pass 1 to this parameter, you will only view accounts that use 95% or more of their allotted disk space
+                :param no_validate: If you pass 1 to this parameter, the function only reads data from your .cpanel/email_accounts.yaml file.
+                :param regex: The regular expression by which you wish to filter the results
+                :returns: json formatted string
+                """
+                data = {
+                        'nearquotaonly': nearquotaonly,
+                        'no_validate': no_validate
+                }
+                if domain:
+                        data['domain'] = domain
+                if regex:
+                        data['regex'] = regex
+                return self.cQuery('listpopswithdisk', **data)
+
+        def accountname(self, account, display):
+                """Displays the account name or All Mail On Your Account.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::accountname=
+
+                :param account: Specifies the account name or email address. The function will return whichever of these values you do not specify.
+                :param display: If present, and you do not specify an account, the function will return the string All Mail On Your Account.
+                :returns: json formatted string
+                """
+                data = {
+                        'account': account,
+                        'display': display
+                }
+                return self.cQuery('accountname', **data)
+
+        def getdiskusage(self, domain, user):
+                """Retrieves information about a specified email account's disk usage.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::getdiskusage=
+
+                :param domain: The domain that corresponds to the email address for which you wish to view disk usage
+                :param user: The username of the email address for which you wish to view disk usage
+                :returns: json formatted string
+                """
+                data = {
+                        'domain': domain,
+                        'user': user
+                }
+                return self.cQuery('getdiskusage', **data)
+
+        def listmaildomains(self, skipmain=True):
+                """Retrieves a list of the domains associated with your account that send and receive email.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listmaildomains=
+
+                :param skipmain: Pass 1 to this variable to skip the main domain
+                :returns: json formatted string
+                """
+                data = {'skipmain': skipmain}
+                return self.cQuery('listmaildomains', **data)
+
+        def listlists(self, domain=None, regex=None):
+                """Lists mailing lists associated with a domain.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listlists=
+
+                :param domain: The domain for which you wish to view a list of mailing lists
+                :param regex: The regular expression by which you wish to filter the results
+                :returns: json formatted string
+                """
+                data = {}
+                if domain:
+                        data['domain'] = domain
+                if regex:
+                        data['regex'] = regex
+                return self.cQuery('listlists', **data)
+
+        # Unroutable Mail Functions
+
+        def setdefaultaddress(self, fwdopt, domain, failmsgs=None, fwdemail=None, pipefwd=None):
+                """Configure a default (catchall) email address.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::setdefaultaddress=
+
+                :param fwdopt: This parameter defines how unroutable mail will be handled.
+                :param domain: Specifies the domain to which you wish to apply the rule.
+                :param failmsgs: Specifies the failure message that you wish to send if an incoming message bounces.
+                :param fwdemail: Specifies the email address to which mail received by the default address is forwarded.
+                :param pipefwd: Specifies the program to which messages received by the default address are piped
+                :returns: json formatted string
+                """
+                data = {
+                        'fwdopt': fwdopt,
+                        'domain': domain
+                }
+                if failmsgs:
+                        data['failmsgs'] = failmsgs
+                if fwdemail:
+                        data['fwdemail'] = fwdemail
+                if pipefwd:
+                        data['pipefwd'] = pipefwd
+                return self.cQuery('setdefaultaddress', **data)
+
+        def checkmaindiscard(self):
+                """Checks how the main email account for a domain handles undeliverable mail.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::checkmaindiscard=
+
+                :returns: json formatted string
+                """
+                return self.cQuery('checkmaindiscard', **data)
+
+        def listdefaultaddresses(self, domain):
+                """Retrieves the default address and the action taken when the default address receives unroutable messages.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listdefaultaddresses=
+
+                :param domain: The domain that corresponds to the default address and information you wish to view
+                :returns: json formatted string
+                """
+                data = {'domain': domain}
+                return self.cQuery('listdefaultaddresses', **data)
+
+        def listaliasbackups(self):
+                """Retrieves a list of domains that use aliases and custom catch-all addresses.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listaliasbackups=
+
+                :returns: json formatted string
+                """
+                return self.cQuery('listaliasbackups', **data)
+
+        # Forwarder Functions
+
+        def addforward(self, domain, email, fwdopt, fwdemail=None, fwdsystem=None, failmsgs=None, pipefwd=None):
+                """Creates an email forwarder for the specified address.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::addforward=
+
+                :param domain: The domain for which you wish to add a forwarder
+                :param email: The username of the email address for which you wish to add a forwarder
+                :param fwdopt: This parameter defines how unroutable mail will be handled.
+                :param fwdemail: The email address to which you wish to forward mail. Use this parameter when fwdopt=fwd.
+                :param fwdsystem: The system account to which you wish to forward email. Use this parameter when fwdopt=system.
+                :param failmsgs: Use this parameter to define the correct failure message. Use this parameter when fwdopt=fail.
+                :param pipefwd: The path to the program to which you wish to pipe email. Use this parameter when fwdopt=pipe.
+                :returns: json formatted string
+                """
+                data = {
+                        'email': email,
+                        'fwdopt': fwdopt,
+                }
+                if fwdemail:
+                        data['fwdemail'] = fwdemail
+                if fwdsystem:
+                        data['fwdsystem'] = fwdsystem
+                if failmsgs:
+                        data['failmsgs'] = failmsgs
+                if pipefwd:
+                        data['pipefwd'] = pipefwd
+                return self.cQuery('addforward', **data)
+
+        def listforwards(self, domain=None, regex=None):
+                """List forwarders associated with a specific domain.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listforwards=
+
+                :param domain: The domain name for which you wish to review forwarders
+                :param regex: The regular expression by which you wish to filter the results
+                :returns: json formatted string
+                """
+                data = {}
+                if domain:
+                        data['domain'] = domain
+                if regex:
+                        data['regex'] = regex
+                return self.cQuery('listforwards', **data)
+
+        def listdomainforwards(self, domain):
+                """Retrieves the destination to which a domain forwarder forwards email.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listdomainforwards=
+
+                :param domain: The domain that corresponds to the forwarder for which you wish to view the destination
+                :returns: json formatted string
+                """
+                data = {'domain': domain}
+                return self.cQuery('listdomainforwards', **data)
+
+        # Filer Functions
+
+        def storefilter(self, account, action, filtername, match, part, val, opt="or", dest=None, oldfiltername=None):
+                """Creates a new email filter.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::storefilter=
+
+                :param account: To configure a user-level filter, enter the email address to which you wish to apply the rule.
+                :param action: Specifies the action that the filter takes.
+                :param filtername: Specifies the name you wish to give to the new filter
+                :param match:  Specifies the new filter match type.
+                :param part: The section of the email to which you wish to apply the match parameter.
+                :param val: Specifies the value against which you wish to match.
+                :param opt: This parameter connects conditionals.
+                :param oldfiltername: This function can also be used to rename an existing filter.
+                :param dest: Specifies the destination of mail that the filter receives, if one is required.
+                :returns: json formatted string
+                """
+                data = {
+                        'account': account,
+                        'action': action,
+                        'filtername': filtername,
+                        'match': match,
+                        'opt': opt,
+                        'part': part,
+                        'val': val
+                }
+                if dest:
+                        data['dest'] = dest
+                if oldfiltername:
+                        data['oldfiltername'] = oldfiltername
+                return self.cQuery('storefilter', **data)
+
+        def deletefilter(self, filtername, account=None):
+                """Deletes an email filter.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::deletefilter=
+
+                :param filtername: Specifies the name of the filter you wish to delete.
+                :param account: Specifies an email address or account username that corresponds to the user-level filter you wish to remove.
+                :returns: json formatted string
+                """
+                data = {'filtername': filtername}
+                if account:
+                        data['account'] = account
+                return self.cQuery('deletefilter', **data)
+
+        def tracefilter(self, msg, account=None):
+                """Tests the action of account-level mail filters.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::tracefilter=
+
+                :param msg: The contents of the body of the message you wish to test.
+                :param account: This parameter allows you to specify and test old-style cPanel filters in the $home/filters directory.
+                :returns: json formatted string
+                """
+                data = {'msg': msg}
+                if account:
+                        data['account'] = account
+                return self.cQuery('tracefilter', **data)
+
+        def filterlist(self, account=None):
+                """Retrieves a list of email filters.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::filterlist=
+
+                :param account: Specifies the email address or account username.
+                :returns: json formatted string
+                """
+                data = {}
+                if account:
+                        data['account'] = account
+                return self.cQuery('filterlist', **data)
+
+        def loadfilter(self, filtername, account=None):
+                """Retrieves the rules and actions associated with an email filter.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::loadfilter=
+
+                :param filtername: Specifies the name of the filter you wish to review.
+                :param account: Specifies the email address or account username.
+                :returns: json formatted string
+                """
+                data = {'filtername': filtername}
+                if account:
+                        data['account'] = account
+                return self.cQuery('loadfilter', **data)
+
+        def filtername(self, account=None, filtername=None):
+                """Counts the number of email filters and returns a default suggested rule name in a Rule [1 + count] format.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::filtername=
+
+                :param account: Specifies the email address associated with the account for which you wish to return a result.
+                :param filtername: Specifies a fallback in the case that the function cannot find any relevant filter files.
+                :returns: json formatted string
+                """
+                data = {}
+                if account:
+                        data['account'] = account
+                if filtername:
+                        data['filtername'] = filtername
+                return self.cQuery('filtername', **data)
+
+        def listfilterbackups(self):
+                """Retrieves a list of domains that use domain-level filters.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listfilterbackups=
+
+                :returns: json formatted string
+                """
+                return self.cQuery('listfilterbackups', **data)
+
+        def listfilters(self):
+                """Lists all of the old-style email filters in your .filter file.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listfilters=
+
+                :returns: json formatted string
+                """
+                return self.cQuery('listfilters', **data)
+
+        # Autoresponder Functions
+
+        def listautoresponders(self, domain=None, regex=None):
+                """Retrieves a list of auto responders associated with the specified domain.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::listautoresponders=
+
+                :param domain: The domain for which you wish to view auto responders
+                :param regex: Regular expressions allow you to filter results based on a set of criteria
+                :returns: json formatted string
+                """
+                data = {}
+                if domain:
+                        data['domain'] = domain
+                if regex:
+                        data['regex'] = regex
+                return self.cQuery('listautoresponders', **data)
+
+        def fetchautoresponder(self, email):
+                """Retrieves information about an auto responder that corresponds to a specified email address.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::fetchautoresponder=
+
+                :param email: The email address that corresponds to the auto responder you wish to review
+                :returns: json formatted string
+                """
+                data = {'email': email}
+                return self.cQuery('fetchautoresponder', **data)
+
+        # Archiving Functions
+
+        def set_archiving_configuration(self, domain, dtype):
+                """Sets the email archiving configuration for the specified domain.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::set_archiving_configuration=
+
+                :param domains: A comma separated list of domains for which you wish to change the configuration
+                :param type: An integer, or empty-string, value that indicates the length of time to keep mail archives of the given type.
+                :returns: json formatted string
+                """
+                data = {
+                        'domain': domain,
+                        'type': dtype
+                }
+                return self.cQuery('set_archiving_configuration', **data)
+
+        def set_archiving_default_configuration(self, dtype):
+                """Sets the default email archiving configuration for any new domains created under the user account.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::set_archiving_default_configuration=
+
+                :param type: An integer, or empty-string, value that indicates the length of time to keep mail archives of the given type.
+                :returns: json formatted string
+                """
+                data = {'type': dtype}
+                return self.cQuery('set_archiving_default_configuration', **data)
+
+        def get_archiving_configuration(self, domain=None, regex=None):
+                """Lists the email archiving configuration for the specified domain.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::get_archiving_configuration=
+
+                :param domain: The domain name for which you wish to view email archiving configuration information
+                :param regex: A case-sensitive regular expression used to filter by domain
+                :returns: json formatted string
+                """
+                data = {}
+                if domain:
+                        data['domain'] = domain
+                if regex:
+                        data['regex'] = regex
+                return self.cQuery('get_archiving_configuration', **data)
+
+        def get_archiving_default_configuration(self, domain):
+                """Lists the default email archiving configuration for the specified domain.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::get_archiving_default_configuration=
+
+                :param domain: The domain for which you wish to view the default configuration
+                :returns: json formatted string
+                """
+                data = {'domain': domain}
+                return self.cQuery('get_archiving_default_configuration', **data)
+
+        def get_archiving_types(self):
+                """Displays the different types of email archiving that are available.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::get_archiving_types=
+
+                :returns: json formatted string
+                """
+                return self.cQuery('get_archiving_types', **data)
+
+        # Mail Directory Functions
+
+        def getabsbrowsedir(self, account, adir="mail"):
+                """Retrieves the full path to a specified mail folder.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::getabsbrowsedir=
+
+                :param account: The email address that corresponds to the directory for which you wish to find the path
+                :param dir: The mail folder that you wish to query for its full path
+                :returns: json formatted string
+                """
+                data = {
+                        'account': account,
+                        'dir': adir
+                }
+                return self.cQuery('getabsbrowsedir', **data)
+
+        def browseboxes(self, account=None, adir="default", showdotfiles=False):
+                """Retrieves a list of mail-related subdirectories (boxes) in your mail directory.
+                http://docs.cpanel.net/twiki/bin/view/ApiDocs/Api2/ApiEmail#=Email::browseboxes=
+
+                :param account: The name of the email account you wish to review
+                :param dir:str = This parameter allows you to specify which mail directories will be displayed.
+                :param showdotfiles: A boolean variable that allows you to specify whether you wish to view hidden directories and files
+                :returns: json formatted string
+                """
+                data = {
+                        'dir': adir,
+                        'showdotfiles': showdotfiles
+                }
+                if account:
+                        data['account'] = account
+                return self.cQuery('browseboxes', **data)
