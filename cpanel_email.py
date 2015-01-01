@@ -3,7 +3,7 @@
 
 Python Library for WHM/Cpanel's API2 Email Module
 
-	https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email
+    https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email
 
 Author: Benton Snyder
 Website: http://bensnyde.me
@@ -24,15 +24,15 @@ class Cpanel:
     def __init__(self, whm_base_url, whm_root_user, whm_root_password, cpanel_user):
             """Constructor
 
-            	Cpanel Email library public constructor.
+                Cpanel Email library public constructor.
 
             Parameters
-            	:param whm_base_url: str whm base url (ex. whm.example.com)
-            	:param whm_root_user: str whm root username
-            	:param whm_root_password: str whm password
-            	:param cpanel_user: str cpanel account to run scripts as
+                :param whm_base_url: str whm base url (ex. whm.example.com)
+                :param whm_root_user: str whm root username
+                :param whm_root_password: str whm password
+                :param cpanel_user: str cpanel account to run scripts as
             Returns
-            	None
+                None
             """
             self.cpanel_user = cpanel_user
             self.whm_base_url = whm_base_url
@@ -42,14 +42,14 @@ class Cpanel:
     def _whm_api_query(self, script, **kwargs):
             """Query WHM API
 
-            	Queries specified WHM server's JSON API with specified query string.
+                Queries specified WHM server's JSON API with specified query string.
 
             Parameters
-            	:param script: Cpanel script name
-            	:param user: Cpanel username underwhich to call from
-            	:param kwargs: Dictionary parameter pairs
+                :param script: Cpanel script name
+                :param user: Cpanel username underwhich to call from
+                :param kwargs: Dictionary parameter pairs
             Returns
-            	:returns: json decoded response from server
+                :returns: json decoded response from server
             """
             query = '/json-api/cpanel?cpanel_jsonapi_user=%s&cpanel_jsonapi_module=Email&cpanel_jsonapi_func=%s&cpanel_xmlapi_version=2&' % (self.cpanel_user, script)
 
@@ -61,30 +61,30 @@ class Cpanel:
                 conn.close()
 
                 return data
-        except httplib.HTTPException as ex:
-            logging.getLogger(apilogger).critical("HTTPException from CpanelEmail API: %s" % ex)
-        except socket.error as ex:
-            logging.getLogger(apilogger).critical("Socket.error connecting to CpanelEmail API: %s" % ex)
-        except ValueError as ex:
-            logging.getLogger(apilogger).critical("ValueError decoding CpanelEmail API response string: %s" % ex)
-        except Exception as ex:
-            logging.getLogger(apilogger).critical("Unhandled Exception while querying CpanelEmail API: %s" % ex)
+            except httplib.HTTPException as ex:
+                logging.getLogger(apilogger).critical("HTTPException from CpanelEmail API: %s" % ex)
+            except socket.error as ex:
+                logging.getLogger(apilogger).critical("Socket.error connecting to CpanelEmail API: %s" % ex)
+            except ValueError as ex:
+                logging.getLogger(apilogger).critical("ValueError decoding CpanelEmail API response string: %s" % ex)
+            except Exception as ex:
+                logging.getLogger(apilogger).critical("Unhandled Exception while querying CpanelEmail API: %s" % ex)
 
 
     def addpop(self, domain, email, password, quota):
         """Add Email Account
 
-        	Adds a new email account.
+            Adds a new email account.
 
-       			https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::addpop
+                   https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::addpop
 
-       	Parameters
-        	:param domain: The domain for the new email account
-        	:param email: The username for the new email account
-        	:param password: The password for the new email account
-        	:param quota: A positive integer that defines the disk quota for the email account (0 is unlimited)
+           Parameters
+            :param domain: The domain for the new email account
+            :param email: The username for the new email account
+            :param password: The password for the new email account
+            :param quota: A positive integer that defines the disk quota for the email account (0 is unlimited)
         Returns
-        	:returns: bool api call result
+            :returns: bool api call result
         """
         data = {
                 'domain': domain,
@@ -107,15 +107,15 @@ class Cpanel:
     def delpop(self, domain, email):
         """Delete Email Account
 
-        	Deletes an email account.
+            Deletes an email account.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::delpop
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::delpop
 
         Parameters
-        	:param domain: The domain for the email account you wish to remove
-        	:param email: The username for the email address you wish to remove
+            :param domain: The domain for the email account you wish to remove
+            :param email: The username for the email address you wish to remove
         Returns
-        	:returns: bool api call result
+            :returns: bool api call result
         """
         data = {
             'domain': domain,
@@ -136,16 +136,16 @@ class Cpanel:
     def editquota(self, domain, email, quota):
         """Edit Quota
 
-        	Modifies an email account's quota.
+            Modifies an email account's quota.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::editquota
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::editquota
 
         Parameters
-        	:param domain: The domain for the email account you wish to modify
-        	:param email: The username for the email address you wish to modify
-        	:param quota: A positive integer that indicates the desired disk quota value in megabytes (0 is unlimited)
+            :param domain: The domain for the email account you wish to modify
+            :param email: The username for the email address you wish to modify
+            :param quota: A positive integer that indicates the desired disk quota value in megabytes (0 is unlimited)
         Returns
-        	:returns: bool api call result
+            :returns: bool api call result
         """
         data = {
             'domain': domain,
@@ -167,16 +167,16 @@ class Cpanel:
     def passwdpop(self, domain, email, password):
         """Change Password
 
-        	Changes an email account's password.
+            Changes an email account's password.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::passwdpop=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::passwdpop=
 
         Parameters
-        	:param domain: The domain for the email address for which you wish to change the password
-        	:param email: The username for the email address for which you wish to change the password
-        	:param password: The desired password for the account
+            :param domain: The domain for the email address for which you wish to change the password
+            :param email: The username for the email address for which you wish to change the password
+            :param password: The desired password for the account
         Returns
-        	:returns: bool api call result
+            :returns: bool api call result
         """
         data = {
             'domain': domain,
@@ -198,14 +198,14 @@ class Cpanel:
     def clearpopcache(self, username):
         """Clear Email Account Cache
 
-        	Rebuilds an email address's cache file.
+            Rebuilds an email address's cache file.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::clearpopcache
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::clearpopcache
 
         Parameters
-        	:param username: The username for the email account for which you wish to rebuild the cache file
+            :param username: The username for the email account for which you wish to rebuild the cache file
         Returns
-        	:returns: bool api call result
+            :returns: bool api call result
         """
         result = self._whm_api_query('clearpopcache', **{'username': username} )
 
@@ -221,14 +221,14 @@ class Cpanel:
     def listpops(self, regex=None):
         """List Email Accounts
 
-        	Retrieves a list of email accounts associated with your cPanel account.
+            Retrieves a list of email accounts associated with your cPanel account.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listpops
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listpops
 
         Parameters
-        	:param regex: The regular expression by which you wish to filter the results
+            :param regex: The regular expression by which you wish to filter the results
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {}
         if regex:
@@ -248,14 +248,14 @@ class Cpanel:
     def listpopssingles(self, regex=None):
         """List Email Accounts w/Logins
 
-        	Retrieves a list of email accounts and logins associated with your cPanel account.
+            Retrieves a list of email accounts and logins associated with your cPanel account.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listpopssingles
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listpopssingles
 
         Parameters
-        	:param regex: The regular expression by which you wish to filter the results
+            :param regex: The regular expression by which you wish to filter the results
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {}
         if regex:
@@ -275,17 +275,17 @@ class Cpanel:
     def listpopswithdisk(self, domain=None, nearquotaonly=False, no_validate=False, regex=None):
         """List Email Accounts w/Disk Usage
 
-        	Lists email accounts, including disk usage, that correspond to a particular domain.
+            Lists email accounts, including disk usage, that correspond to a particular domain.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listpopswithdisk
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listpopswithdisk
 
         Parameters
-        	:param domain: The domain for which you wish to view email accounts
-        	:param nearquotaonly: If you pass 1 to this parameter, you will only view accounts that use 95% or more of their allotted disk space
-        	:param no_validate: If you pass 1 to this parameter, the function only reads data from your .cpanel/email_accounts.yaml file.
-        	:param regex: The regular expression by which you wish to filter the results
+            :param domain: The domain for which you wish to view email accounts
+            :param nearquotaonly: If you pass 1 to this parameter, you will only view accounts that use 95% or more of their allotted disk space
+            :param no_validate: If you pass 1 to this parameter, the function only reads data from your .cpanel/email_accounts.yaml file.
+            :param regex: The regular expression by which you wish to filter the results
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {
             'nearquotaonly': nearquotaonly,
@@ -311,15 +311,15 @@ class Cpanel:
     def accountname(self, account, display):
         """Get Account Name
 
-        	Displays the account name or All Mail On Your Account.
+            Displays the account name or All Mail On Your Account.
 
-        	https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::accountname
+            https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::accountname
 
         Parameters
-        	:param account: Specifies the account name or email address. The function will return whichever of these values you do not specify.
-        	:param display: If present, and you do not specify an account, the function will return the string All Mail On Your Account.
+            :param account: Specifies the account name or email address. The function will return whichever of these values you do not specify.
+            :param display: If present, and you do not specify an account, the function will return the string All Mail On Your Account.
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {
             'account': account,
@@ -340,15 +340,15 @@ class Cpanel:
     def getdiskusage(self, domain, user):
         """Get Email Account Disk Usage
 
-        	Retrieves information about a specified email account's disk usage.
+            Retrieves information about a specified email account's disk usage.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::getdiskusage
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::getdiskusage
 
         Parameters
-        	:param domain: The domain that corresponds to the email address for which you wish to view disk usage
-        	:param user: The username of the email address for which you wish to view disk usage
+            :param domain: The domain that corresponds to the email address for which you wish to view disk usage
+            :param user: The username of the email address for which you wish to view disk usage
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {
             'domain': domain,
@@ -369,14 +369,14 @@ class Cpanel:
     def listmaildomains(self, skipmain=True):
         """Get Email Domains
 
-        	Retrieves a list of the domains associated with your account that send and receive email.
+            Retrieves a list of the domains associated with your account that send and receive email.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listmaildomains
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listmaildomains
 
         Parameters
-        	:param skipmain: Pass 1 to this variable to skip the main domain
+            :param skipmain: Pass 1 to this variable to skip the main domain
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('listmaildomains', **{'skipmain': skipmain})
 
@@ -392,15 +392,15 @@ class Cpanel:
     def listlists(self, domain=None, regex=None):
         """Get Mailing Lists
 
-        	Lists mailing lists associated with a domain.
+            Lists mailing lists associated with a domain.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listlists
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listlists
 
         Parameters
-        	:param domain: The domain for which you wish to view a list of mailing lists
-        	:param regex: The regular expression by which you wish to filter the results
+            :param domain: The domain for which you wish to view a list of mailing lists
+            :param regex: The regular expression by which you wish to filter the results
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {}
         if domain:
@@ -422,18 +422,18 @@ class Cpanel:
     def setdefaultaddress(self, fwdopt, domain, failmsgs=None, fwdemail=None, pipefwd=None):
         """Set Default Email Address
 
-        	Configure a default (catchall) email address.
+            Configure a default (catchall) email address.
 
-        	https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::setdefaultaddress
+            https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::setdefaultaddress
 
         Parameters
-        	:param fwdopt: This parameter defines how unroutable mail will be handled.
-        	:param domain: Specifies the domain to which you wish to apply the rule.
-        	:param failmsgs: Specifies the failure message that you wish to send if an incoming message bounces.
-        	:param fwdemail: Specifies the email address to which mail received by the default address is forwarded.
-        	:param pipefwd: Specifies the program to which messages received by the default address are piped
+            :param fwdopt: This parameter defines how unroutable mail will be handled.
+            :param domain: Specifies the domain to which you wish to apply the rule.
+            :param failmsgs: Specifies the failure message that you wish to send if an incoming message bounces.
+            :param fwdemail: Specifies the email address to which mail received by the default address is forwarded.
+            :param pipefwd: Specifies the program to which messages received by the default address are piped
         Returns
-        	:returns: bool api call result
+            :returns: bool api call result
         """
         data = {
             'fwdopt': fwdopt,
@@ -461,14 +461,14 @@ class Cpanel:
     def checkmaindiscard(self):
         """Get Discard Settings
 
-        	Checks how the main email account for a domain handles undeliverable mail.
+            Checks how the main email account for a domain handles undeliverable mail.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::checkmaindiscard
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::checkmaindiscard
 
         Parameters
-        	None
+            None
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('checkmaindiscard', **{})
 
@@ -484,14 +484,14 @@ class Cpanel:
     def listdefaultaddresses(self, domain):
         """Get Default Addresses
 
-        	Retrieves the default address and the action taken when the default address receives unroutable messages.
+            Retrieves the default address and the action taken when the default address receives unroutable messages.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listdefaultaddresses
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listdefaultaddresses
 
-       	Parameters
-        	:param domain: The domain that corresponds to the default address and information you wish to view
+           Parameters
+            :param domain: The domain that corresponds to the default address and information you wish to view
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('listdefaultaddresses', **{'domain': domain})
 
@@ -507,14 +507,14 @@ class Cpanel:
     def listaliasbackups(self):
         """Get Domains w/Aliases
 
-        	Retrieves a list of domains that use aliases and custom catch-all addresses.
+            Retrieves a list of domains that use aliases and custom catch-all addresses.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listaliasbackups
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listaliasbackups
 
         Parameters
-        	None
+            None
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('listaliasbackups', **{})
 
@@ -530,20 +530,20 @@ class Cpanel:
     def addforward(self, domain, email, fwdopt, fwdemail=None, fwdsystem=None, failmsgs=None, pipefwd=None):
         """Add Forward
 
-        	Creates an email forwarder for the specified address.
+            Creates an email forwarder for the specified address.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::addforward
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::addforward
 
         Parameters
-        	:param domain: The domain for which you wish to add a forwarder
-        	:param email: The username of the email address for which you wish to add a forwarder
-        	:param fwdopt: This parameter defines how unroutable mail will be handled.
-        	:param fwdemail: The email address to which you wish to forward mail. Use this parameter when fwdopt=fwd.
-        	:param fwdsystem: The system account to which you wish to forward email. Use this parameter when fwdopt=system.
-        	:param failmsgs: Use this parameter to define the correct failure message. Use this parameter when fwdopt=fail.
-        	:param pipefwd: The path to the program to which you wish to pipe email. Use this parameter when fwdopt=pipe.
+            :param domain: The domain for which you wish to add a forwarder
+            :param email: The username of the email address for which you wish to add a forwarder
+            :param fwdopt: This parameter defines how unroutable mail will be handled.
+            :param fwdemail: The email address to which you wish to forward mail. Use this parameter when fwdopt=fwd.
+            :param fwdsystem: The system account to which you wish to forward email. Use this parameter when fwdopt=system.
+            :param failmsgs: Use this parameter to define the correct failure message. Use this parameter when fwdopt=fail.
+            :param pipefwd: The path to the program to which you wish to pipe email. Use this parameter when fwdopt=pipe.
         Returns
-        	:returns: bool api call result
+            :returns: bool api call result
         """
         data = {
             'email': email,
@@ -573,15 +573,15 @@ class Cpanel:
     def listforwards(self, domain=None, regex=None):
         """Get Forwards
 
-        	List forwarders associated with a specific domain.
+            List forwarders associated with a specific domain.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listforwards=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listforwards=
 
         Parameters
-        	:param domain: The domain name for which you wish to review forwarders
-        	:param regex: The regular expression by which you wish to filter the results
+            :param domain: The domain name for which you wish to review forwarders
+            :param regex: The regular expression by which you wish to filter the results
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {}
         if domain:
@@ -603,14 +603,14 @@ class Cpanel:
     def listdomainforwards(self, domain):
         """Get Domain Forwards
 
-        	Retrieves the destination to which a domain forwarder forwards email.
+            Retrieves the destination to which a domain forwarder forwards email.
         
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listdomainforwards=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listdomainforwards=
 
         Parameters
-        	:param domain: The domain that corresponds to the forwarder for which you wish to view the destination
+            :param domain: The domain that corresponds to the forwarder for which you wish to view the destination
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('listdomainforwards', **{'domain': domain})
 
@@ -626,22 +626,22 @@ class Cpanel:
     def storefilter(self, account, action, filtername, match, part, val, opt="or", dest=None, oldfiltername=None):
         """Create Email Filter
 
-        	Creates a new email filter.
+            Creates a new email filter.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::storefilter=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::storefilter=
 
         Parameters
-        	:param account: To configure a user-level filter, enter the email address to which you wish to apply the rule.
-        	:param action: Specifies the action that the filter takes.
-        	:param filtername: Specifies the name you wish to give to the new filter
-        	:param match:  Specifies the new filter match type.
-        	:param part: The section of the email to which you wish to apply the match parameter.
-        	:param val: Specifies the value against which you wish to match.
-        	:param opt: This parameter connects conditionals.
-        	:param oldfiltername: This function can also be used to rename an existing filter.
-        	:param dest: Specifies the destination of mail that the filter receives, if one is required.
+            :param account: To configure a user-level filter, enter the email address to which you wish to apply the rule.
+            :param action: Specifies the action that the filter takes.
+            :param filtername: Specifies the name you wish to give to the new filter
+            :param match:  Specifies the new filter match type.
+            :param part: The section of the email to which you wish to apply the match parameter.
+            :param val: Specifies the value against which you wish to match.
+            :param opt: This parameter connects conditionals.
+            :param oldfiltername: This function can also be used to rename an existing filter.
+            :param dest: Specifies the destination of mail that the filter receives, if one is required.
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {
             'account': account,
@@ -672,15 +672,15 @@ class Cpanel:
     def deletefilter(self, filtername, account=None):
         """Delete Email Filter
 
-        	Deletes an email filter.
+            Deletes an email filter.
         
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::deletefilter=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::deletefilter=
 
         Parameters
-        	:param filtername: Specifies the name of the filter you wish to delete.
-        	:param account: Specifies an email address or account username that corresponds to the user-level filter you wish to remove.
+            :param filtername: Specifies the name of the filter you wish to delete.
+            :param account: Specifies an email address or account username that corresponds to the user-level filter you wish to remove.
         Returns
-        	:returns: bool api call result
+            :returns: bool api call result
         """
         data = {'filtername': filtername}
         if account:
@@ -700,15 +700,15 @@ class Cpanel:
     def tracefilter(self, msg, account=None):
         """Trace Email Filter
 
-        	Tests the action of account-level mail filters.
+            Tests the action of account-level mail filters.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::tracefilter=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::tracefilter=
 
         Parameters
-        	:param msg: The contents of the body of the message you wish to test.
-        	:param account: This parameter allows you to specify and test old-style cPanel filters in the $home/filters directory.
+            :param msg: The contents of the body of the message you wish to test.
+            :param account: This parameter allows you to specify and test old-style cPanel filters in the $home/filters directory.
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {'msg': msg}
         if account:
@@ -728,14 +728,14 @@ class Cpanel:
     def filterlist(self, account=None):
         """Get Email Filters
 
-        	Retrieves a list of email filters.
+            Retrieves a list of email filters.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::filterlist=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::filterlist=
 
         Parameters
-        	:param account: Specifies the email address or account username.
+            :param account: Specifies the email address or account username.
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {}
         if account:
@@ -755,15 +755,15 @@ class Cpanel:
     def loadfilter(self, filtername, account=None):
         """Load Email Filter
 
-        	Retrieves the rules and actions associated with an email filter.
+            Retrieves the rules and actions associated with an email filter.
 
-		        https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::loadfilter=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::loadfilter=
 
         Parameters
-        	:param filtername: Specifies the name of the filter you wish to review.
-        	:param account: Specifies the email address or account username.
+            :param filtername: Specifies the name of the filter you wish to review.
+            :param account: Specifies the email address or account username.
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {'filtername': filtername}
         if account:
@@ -783,15 +783,15 @@ class Cpanel:
     def filtername(self, account=None, filtername=None):
         """Get Suggested Filter Name
 
-        	Counts the number of email filters and returns a default suggested rule name in a Rule [1 + count] format.
+            Counts the number of email filters and returns a default suggested rule name in a Rule [1 + count] format.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::filtername=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::filtername=
 
         Parameters
-        	:param account: Specifies the email address associated with the account for which you wish to return a result.
-        	:param filtername: Specifies a fallback in the case that the function cannot find any relevant filter files.
+            :param account: Specifies the email address associated with the account for which you wish to return a result.
+            :param filtername: Specifies a fallback in the case that the function cannot find any relevant filter files.
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {}
         if account:
@@ -813,14 +813,14 @@ class Cpanel:
     def listfilterbackups(self):
         """Get Domains With Domain Filters
 
-        	Retrieves a list of domains that use domain-level filters.
+            Retrieves a list of domains that use domain-level filters.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listfilterbackups=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listfilterbackups=
 
         Parameters
-        	None
+            None
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('listfilterbackups', **{})
 
@@ -836,14 +836,14 @@ class Cpanel:
     def listfilters(self):
         """Get Email Filters
 
-        	Lists all of the old-style email filters in your .filter file.
+            Lists all of the old-style email filters in your .filter file.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listfilters=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listfilters=
 
         Parameters
-        	None
+            None
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('listfilters', **{})
 
@@ -859,15 +859,15 @@ class Cpanel:
     def listautoresponders(self, domain=None, regex=None):
         """Get Auto Responders
 
-        	Retrieves a list of auto responders associated with the specified domain.
+            Retrieves a list of auto responders associated with the specified domain.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listautoresponders=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::listautoresponders=
 
         Parameters
-        	:param domain: The domain for which you wish to view auto responders
-        	:param regex: Regular expressions allow you to filter results based on a set of criteria
+            :param domain: The domain for which you wish to view auto responders
+            :param regex: Regular expressions allow you to filter results based on a set of criteria
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {}
         if domain:
@@ -889,14 +889,14 @@ class Cpanel:
     def fetchautoresponder(self, email):
         """Get Auto Responder
 
-        	Retrieves information about an auto responder that corresponds to a specified email address.
+            Retrieves information about an auto responder that corresponds to a specified email address.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::fetchautoresponder=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::fetchautoresponder=
 
         Parameters
-        	:param email: The email address that corresponds to the auto responder you wish to review
+            :param email: The email address that corresponds to the auto responder you wish to review
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('fetchautoresponder', **{'email': email})
 
@@ -938,14 +938,14 @@ class Cpanel:
     def set_archiving_default_configuration(self, dtype):
         """Set Archiving Configuration
 
-        	Sets the default email archiving configuration for any new domains created under the user account.
+            Sets the default email archiving configuration for any new domains created under the user account.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::set_archiving_default_configuration=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::set_archiving_default_configuration=
 
         Parameters
-        	:param type: An integer, or empty-string, value that indicates the length of time to keep mail archives of the given type.
+            :param type: An integer, or empty-string, value that indicates the length of time to keep mail archives of the given type.
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('set_archiving_default_configuration', **{'type': dtype})
 
@@ -961,15 +961,15 @@ class Cpanel:
     def get_archiving_configuration(self, domain=None, regex=None):
         """Get Archiving Configuration
 
-        	Lists the email archiving configuration for the specified domain.
+            Lists the email archiving configuration for the specified domain.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::get_archiving_configuration=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::get_archiving_configuration=
 
         Parameters
-        	:param domain: The domain name for which you wish to view email archiving configuration information
-        	:param regex: A case-sensitive regular expression used to filter by domain
+            :param domain: The domain name for which you wish to view email archiving configuration information
+            :param regex: A case-sensitive regular expression used to filter by domain
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {}
         if domain:
@@ -991,14 +991,14 @@ class Cpanel:
     def get_archiving_default_configuration(self, domain):
         """Get Default Archiving Configuration
 
-        	Lists the default email archiving configuration for the specified domain.
+            Lists the default email archiving configuration for the specified domain.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::get_archiving_default_configuration=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::get_archiving_default_configuration=
 
         Parameters
-        	:param domain: The domain for which you wish to view the default configuration
+            :param domain: The domain for which you wish to view the default configuration
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('get_archiving_default_configuration', **{'domain': domain})
 
@@ -1014,14 +1014,14 @@ class Cpanel:
     def get_archiving_types(self):
         """Get Archiving Typse
 
-        	Displays the different types of email archiving that are available.
+            Displays the different types of email archiving that are available.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::get_archiving_types=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::get_archiving_types=
 
         Parameters
-        	None
+            None
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         result = self._whm_api_query('get_archiving_types', **{})
 
@@ -1037,15 +1037,15 @@ class Cpanel:
     def getabsbrowsedir(separatedlf, account, adir="mail"):
         """Get Mail Folder Path
 
-        	Retrieves the full path to a specified mail folder.
+            Retrieves the full path to a specified mail folder.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::getabsbrowsedir=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::getabsbrowsedir=
 
         Parameters
-        	:param account: The email address that corresponds to the directory for which you wish to find the path
-        	:param dir: The mail folder that you wish to query for its full path
+            :param account: The email address that corresponds to the directory for which you wish to find the path
+            :param dir: The mail folder that you wish to query for its full path
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {
             'account': account,
@@ -1066,16 +1066,16 @@ class Cpanel:
     def browseboxes(self, account=None, adir="default", showdotfiles=False):
         """Get Mailboxes
 
-        	Retrieves a list of mail-related subdirectories (boxes) in your mail directory.
+            Retrieves a list of mail-related subdirectories (boxes) in your mail directory.
 
-        		https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::browseboxes=
+                https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email#cPanelAPI2-Email-Email::browseboxes=
 
         Parameters
-        	:param account: The name of the email account you wish to review
-        	:param dir:str = This parameter allows you to specify which mail directories will be displayed.
-        	:param showdotfiles: A boolean variable that allows you to specify whether you wish to view hidden directories and files
+            :param account: The name of the email account you wish to review
+            :param dir:str = This parameter allows you to specify which mail directories will be displayed.
+            :param showdotfiles: A boolean variable that allows you to specify whether you wish to view hidden directories and files
         Returns
-        	:returns: json formatted string
+            :returns: json formatted string
         """
         data = {
             'dir': adir,
