@@ -17,7 +17,7 @@ import json
 import logging
 import socket
 
-class Cpanel:
+class CpanelEmail:
     def __init__(self, whm_base_url, whm_root_user, whm_root_password, cpanel_user):
             """Constructor
 
