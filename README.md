@@ -14,6 +14,7 @@ Installation
 ---
 ```
 # pip install py-cpanel-email-api
+```
 
 Usage
 ---
