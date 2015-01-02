@@ -20,6 +20,7 @@ Usage
 ---
 ```
 from cpanel_email_api import CpanelEmail
+
 cpanel = CpanelEmail("whm.example.com", "root", "strongpassword", "some_cpanel_user")
 print cpanel.listpops()
 ```
