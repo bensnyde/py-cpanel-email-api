@@ -17,9 +17,6 @@ import json
 import logging
 import socket
 
-# Log handler
-apilogger = "apilogger"
-
 class Cpanel:
     def __init__(self, whm_base_url, whm_root_user, whm_root_password, cpanel_user):
             """Constructor
@@ -62,13 +59,13 @@ class Cpanel:
 
                 return data
             except httplib.HTTPException as ex:
-                logging.getLogger(apilogger).critical("HTTPException from CpanelEmail API: %s" % ex)
+                logging..critical("HTTPException from CpanelEmail API: %s" % ex)
             except socket.error as ex:
-                logging.getLogger(apilogger).critical("Socket.error connecting to CpanelEmail API: %s" % ex)
+                logging..critical("Socket.error connecting to CpanelEmail API: %s" % ex)
             except ValueError as ex:
-                logging.getLogger(apilogger).critical("ValueError decoding CpanelEmail API response string: %s" % ex)
+                logging..critical("ValueError decoding CpanelEmail API response string: %s" % ex)
             except Exception as ex:
-                logging.getLogger(apilogger).critical("Unhandled Exception while querying CpanelEmail API: %s" % ex)
+                logging..critical("Unhandled Exception while querying CpanelEmail API: %s" % ex)
 
 
     def addpop(self, domain, email, password, quota):
@@ -99,7 +96,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return True
         except Exception as ex:
-            logging.getLogger(apilogger).error('addpop(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('addpop(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -128,7 +125,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return True
         except Exception as ex:
-            logging.getLogger(apilogger).error('delpop(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('delpop(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -159,7 +156,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return True
         except Exception as ex:
-            logging.getLogger(apilogger).error('editquota(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('editquota(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -190,7 +187,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return True
         except Exception as ex:
-            logging.getLogger(apilogger).error('passwdpop(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('passwdpop(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -213,7 +210,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return True
         except Exception as ex:
-            logging.getLogger(apilogger).error('clearpopcache(%s) returned unexpected result: %s' % (username, ex))
+            logging..error('clearpopcache(%s) returned unexpected result: %s' % (username, ex))
 
         return False
 
@@ -240,7 +237,7 @@ class Cpanel:
             if result["cpanelresult"]["event"]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listpops(%S) returned unexpected result: %s' % (data, ex))
+            logging..error('listpops(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -267,7 +264,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listpopssingles(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('listpopssingles(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -303,7 +300,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listpopswithdisk(%s) returned unexpected result: %s' % ex)
+            logging..error('listpopswithdisk(%s) returned unexpected result: %s' % ex)
 
         return False
 
@@ -332,7 +329,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('accountname(%s) returned unexpected result: %s' % ex)
+            logging..error('accountname(%s) returned unexpected result: %s' % ex)
 
         return False
 
@@ -361,7 +358,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('getdiskusage(%s) returned unexpected result: %s' % ex)
+            logging..error('getdiskusage(%s) returned unexpected result: %s' % ex)
 
         return False
 
@@ -384,7 +381,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listmaildomains(%s) returned unexpected result: %s' % (skipmain, ex))
+            logging..error('listmaildomains(%s) returned unexpected result: %s' % (skipmain, ex))
 
         return False
 
@@ -414,7 +411,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except:
-            logging.getLogger(apilogger).error('listlists(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('listlists(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -453,7 +450,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return True
         except Exception as ex:
-            logging.getLogger(apilogger).error('setdefaultaddress(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('setdefaultaddress(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -476,7 +473,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('checkmaindiscard() returned unexpected result: %s' % ex)
+            logging..error('checkmaindiscard() returned unexpected result: %s' % ex)
 
         return False
 
@@ -499,7 +496,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listdefaultaddresses(%s) returned unexpected result: %s' % (domain, ex))
+            logging..error('listdefaultaddresses(%s) returned unexpected result: %s' % (domain, ex))
 
         return False
 
@@ -522,7 +519,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listaliasbackups() returned unexpected result: %s' % ex)
+            logging..error('listaliasbackups() returned unexpected result: %s' % ex)
 
         return False
 
@@ -565,7 +562,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return True
         except Exception as ex:
-            logging.getLogger(apilogger).error('addforward(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('addforward(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -595,7 +592,7 @@ class Cpanel:
             if result["cpanelresult"]["event"]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listforwards(%s) returned unexpected result: %s' % ex)
+            logging..error('listforwards(%s) returned unexpected result: %s' % ex)
 
         return False
 
@@ -618,7 +615,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('Failed to listdomainforwards(%s): %s' % (domain, ex))
+            logging..error('Failed to listdomainforwards(%s): %s' % (domain, ex))
 
         return False
 
@@ -664,7 +661,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('storefilter(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('storefilter(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -692,7 +689,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return True
         except Exception as ex:
-            logging.getLogger(apilogger).error('deletefilter(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('deletefilter(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -720,7 +717,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('tracefilter(%s) returned unexpected result: %s' % ex)
+            logging..error('tracefilter(%s) returned unexpected result: %s' % ex)
 
         return False
 
@@ -747,7 +744,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('filterlist(%s) returned unexpected result: %s' % ex)
+            logging..error('filterlist(%s) returned unexpected result: %s' % ex)
 
         return False
 
@@ -775,7 +772,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('loadfilter(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('loadfilter(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -805,7 +802,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('filtername(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('filtername(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -828,7 +825,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listfilterbackups() returned unexpected result: %s' % ex)
+            logging..error('listfilterbackups() returned unexpected result: %s' % ex)
 
         return False
 
@@ -851,7 +848,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listfilters() returned unexpected result: %s' % ex)
+            logging..error('listfilters() returned unexpected result: %s' % ex)
 
         return False
 
@@ -881,7 +878,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('listautoresponders(%s): %s' % (data, ex))
+            logging..error('listautoresponders(%s): %s' % (data, ex))
 
         return False
 
@@ -904,7 +901,7 @@ class Cpanel:
             if result["cpanelresult"]["event"]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('Failed to fetchautoresponder(%s) returned unexpected result: %s' % (email, ex))
+            logging..error('Failed to fetchautoresponder(%s) returned unexpected result: %s' % (email, ex))
 
         return False
 
@@ -930,7 +927,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('set_archiving_configuration(%s) returned unexpected result: %s' % ex)
+            logging..error('set_archiving_configuration(%s) returned unexpected result: %s' % ex)
 
         return False
 
@@ -953,7 +950,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('Failed to set_archiving_default_configuration(%s): %s' % (dtype, ex))
+            logging..error('Failed to set_archiving_default_configuration(%s): %s' % (dtype, ex))
 
         return False
 
@@ -983,7 +980,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('get_archiving_configuration(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('get_archiving_configuration(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -1006,7 +1003,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('get_archiving_default_configuration(%s) returned unexpected result: %s' % (domain, ex))
+            logging..error('get_archiving_default_configuration(%s) returned unexpected result: %s' % (domain, ex))
 
         return False
 
@@ -1029,7 +1026,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('get_archiving_types() returned unexpected result: %s' % ex)
+            logging..error('get_archiving_types() returned unexpected result: %s' % ex)
 
         return False
 
@@ -1058,7 +1055,7 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('getabsbrowserdir(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('getabsbrowserdir(%s) returned unexpected result: %s' % (data, ex))
 
         return False
 
@@ -1091,6 +1088,6 @@ class Cpanel:
             if result["cpanelresult"]["data"][0]["result"] == 1:
                 return result["cpanelresult"]["data"]
         except Exception as ex:
-            logging.getLogger(apilogger).error('browseboxes(%s) returned unexpected result: %s' % (data, ex))
+            logging..error('browseboxes(%s) returned unexpected result: %s' % (data, ex))
 
         return False
