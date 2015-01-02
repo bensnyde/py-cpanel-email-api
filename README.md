@@ -10,9 +10,15 @@ https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email
 - Created: 8/15/13
 - Revised: 1/1/15
 
+Installation
+---
+```
+# pip install py-cpanel-email-api
+
 Usage
 ---
 ```
-cpanel = Cpanel("whm.example.com", "root", "strongpassword", "some_cpanel_user")
+from cpanel_email_api import CpanelEmail
+cpanel = CpanelEmail("whm.example.com", "root", "strongpassword", "some_cpanel_user")
 print cpanel.listpops()
 ```
