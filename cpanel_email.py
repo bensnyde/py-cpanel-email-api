@@ -8,7 +8,7 @@ Python Library for WHM/Cpanel's API2 Email Module
 Author: Benton Snyder
 Website: http://bensnyde.me
 Created: 8/15/13
-Revised: 1/1/15
+Revised: 1/2/15
 
 """
 import base64
