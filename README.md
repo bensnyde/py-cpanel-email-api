@@ -8,7 +8,7 @@ https://documentation.cpanel.net/display/SDK/cPanel+API+2+-+Email
 - Author: Benton Snyder
 - Website: http://bensnyde.me
 - Created: 8/15/13
-- Revised: 1/1/15
+- Revised: 1/2/15
 
 Installation
 ---
